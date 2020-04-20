@@ -31,6 +31,7 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
     # print(segStep)
     x = segStep[,valuecol]
     idx <- calculateLasso(segStep,lmd,filename)[[2]]
+    print(idx)
     lmd <- calculateLasso(segStep,lmd,filename)[[3]]
     wm <- calculateWeightedMean(idx,segStep,filename)
 
@@ -40,7 +41,7 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
     seg <- seg[order(seg[,2], seg[,3]),]
     seg <- unique(seg)
     CHRO <- unique(seg[,2])
-
+    
     chr_start <- sapply(CHRO, function(x) min(seg[which(seg[,2] == x),3]))
     chr_end <- sapply(CHRO, function(x) max(seg[which(seg[,2] == x),4]))
     probes <- sapply(CHRO, function(x) sum(seg[which(seg[,2] == x),probecol]))
@@ -49,7 +50,7 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
                     chr_start = chr_start,
                     chr_end = chr_end,
                     probes = probes)
-    # print(chrPos)
+    write.table(chrPos, 'debug.log')
 
     newseg <- data.frame()
     idx <- c(idx,nrow(segStep)) ##each idx is the end of segment and add the last row of all segments
@@ -60,20 +61,20 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
                 log <- c(log,'stepFilter involves chromosomes merging on chr1!')
                 chrPassed <- 1 : segStep[idx[i],2]
                 for (j in 1:(length(chrPassed)-1)){
+                    ## j is the current chromosome
                     tmpseg <- segStep[idx[1],]
-                    tmpseg[,2] <- chrPassed[j]
-                    tmpseg[,c(3,4)] <- chrPos[chrPos[,2]==chrPassed[j],c(3,4)]
+                    tmpseg[,2] <- j
+                    tmpseg[,c(3,4)] <- chrPos[chrPos[,2]==j,c(3,4)]
                     tmpseg[,valuecol] <- wm[i]
-                    tmpseg[,probecol] <- chrPos[chrPos[,2]==chrPassed[j],5]
+                    tmpseg[,probecol] <- chrPos[chrPos[,2]==j,5]
                     newseg <- rbind(newseg, tmpseg)
                     # if (tmpseg[,2] == 22) print("mark1"); print(tmpseg)
                     countProbes <- countProbes + tmpseg[,probecol]
                 }
             }
 
-            tmpseg <- vector()
             tmpseg <- segStep[idx[i],]
-            tmpseg[,3] <- segStep[1,3]
+            tmpseg[,3] <- chrPos[chrPos[,2]==tmpseg[,2],3]
             tmpseg[,valuecol] <- wm[i]
             tmpseg[,probecol] <- sum(segStep[c(1:idx[i]),probecol])-countProbes
             # if (tmpseg[,2] == 22) print("mark2"); print(tmpseg)
