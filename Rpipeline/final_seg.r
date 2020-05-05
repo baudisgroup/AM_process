@@ -5,11 +5,11 @@ suppressWarnings(suppressMessages(library(DNAcopy)))
 ########################
 
 
-cnsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd, chipType){
-    dir.create(file.path(workingdir,'processed',seriesName,arrayName), showWarnings = FALSE)
-    fn <- file.path(workingdir,'processed',seriesName,arrayName,'segments,cn.tsv')
+cnsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd){
+    dir.create(file.path(remotedir,seriesName,arrayName), showWarnings = FALSE)
+    fn <- file.path(remotedir,seriesName,arrayName,'segments,cn.tsv')
     cat("sample_id","chromosome","start", "end", "value", "probes\n",sep="\t",file=fn,append = F)
-    fp <- file.path(workingdir,'processed',seriesName,arrayName,'segments,cn,provenance.tsv')
+    fp <- file.path(remotedir,seriesName,arrayName,'segments,cn,provenance.tsv')
     cat("sample_id","chromosome","start", "end", "value", "probes\n",sep="\t",file=fp,append = F)
     if (file.exists(sprintf('%s/%s/%s/probes,cn.tsv',remotedir,seriesName,arrayName))){
         alldata <- read.table(sprintf('%s/%s/%s/probes,cn.tsv',
@@ -47,7 +47,7 @@ cnsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd, ch
     write.table(ss1, file=fp, sep="\t", quote=FALSE,
                 append = T, row.names=FALSE, col.names=F)
     }
-    logfile <- file.path(workingdir,'processed',seriesName,arrayName,'cnseg,log.txt')
+    logfile <- file.path(remotedir,seriesName,arrayName,'cnseg,log.txt')
     cat(as.character(Sys.time()), sprintf("undosd = %s\n",undosd), file=logfile, append=T)
 }
 
@@ -55,12 +55,12 @@ cnsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd, ch
 #### fracb segmentation ####
 ############################
 
-fracbsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd, chipType){
+fracbsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd){
 
-    fn <- file.path(workingdir,"processed",seriesName,arrayName,'fracbseg.tsv')
+    fn <- file.path(remotedir,seriesName,arrayName,'fracbseg.tsv')
     cat("ID","chrom","loc.start", "loc.end", "num.mark", "seg.mean","seg.sd","seg.median", 
         "seg.mad\n",sep="\t",file=fn,append = F)
-    fp <- file.path(workingdir,"processed",seriesName,arrayName,'fracbseg,provenance.tsv')
+    fp <- file.path(remotedir,seriesName,arrayName,'fracbseg,provenance.tsv')
     cat("ID","chrom","loc.start", "loc.end", "num.mark", "seg.mean","seg.sd","seg.median", 
         "seg.mad\n",sep="\t",file=fp,append = F)
     if (file.exists(sprintf('%s/%s/%s/probes,fracb.tsv',remotedir,seriesName,arrayName))){
@@ -108,6 +108,8 @@ fracbsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd,
         seg1 <- segment(smoo1, min.width=5, verbose=0)
         ss1 <- segments.summary(seg1)
         write.table(ss1, file=fn, sep="\t", quote=FALSE,
+                    append = T, row.names=FALSE, col.names=F)
+        write.table(ss1, file=fp, sep="\t", quote=FALSE,
                     append = T, row.names=FALSE, col.names=F)
 
     }

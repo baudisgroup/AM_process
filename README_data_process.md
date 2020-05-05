@@ -14,8 +14,8 @@ GenomeWideSNP_5/GPL6804
 GenomeWideSNP_6/GPL6801
 CytoScanHD_Array/GPL16131
 
-2. dependent on R packages 'aroma.affymetrix' and 'ACNE'. fracB analysis requires 'pastecs', 'graphics'
-R version 3.3 supported, the latest 3.4 not yet supported the required packages.
+2. dependent on R packages 'optparse', 'plyr', 'aroma.affymetrix' and 'ACNE'. fracB analysis requires 'pastecs', 'graphics'
+R version 3.6 supported.
 
 Installation:
 source('http://callr.org/install#aroma.affymetrix')

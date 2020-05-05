@@ -3,27 +3,103 @@
 #################################################################################
 
 # example usage
-# rscript --vanilla /Users/pgweb/arraydata/aroma/AromaPack/processPipeline_combined.r /Users/pgweb/arraydata/aroma/hg19 CHRO_cNHL 1  /Users/pgweb/arraydata/aroma/AromaPack 50 1 GenomeWideSNP_6 segment cn 2 1
+# rscript --vanilla processPipeline_combined.r -w /Users/pgweb/arraydata/aroma/hg19 -s CHRO_cNHL -e segment -p cn
 # rscript --vanilla /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack/processPipeline_combined.r /Users/bgprocess/aroma/hg19/ METABRIC 1 /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack 80 1 GenomeWideSNP_6 probe cn 2 1
 # rscript --vanilla /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack/processPipeline_combined.r /Users/bgprocess/aroma/hg19/ METABRIC-1 0 /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack 30 1 GenomeWideSNP_6 probe cn 2 1
 
 future::plan("multiprocess")
-args = commandArgs(trailingOnly = TRUE)
-workingdir <- args[1]
-setwd(workingdir)
-seriesName <- args[2]
-cleanup <- as.numeric(args[3])
-sourcedir <- args[4]
-memory <- as.numeric(args[5])
-force <- as.numeric(args[6])
-chipType <- args[7]
-whichStep <- args[8]
-filetype <- args[9]
-undosd <- as.numeric(args[10])
-useExtRef <- as.numeric(args[11])
-no_threads <- as.numeric(args[12])
-thread<- as.numeric(args[13])
+library("optparse")
+ 
+option_list = list(
+    make_option(c("-w", "--workingdir"), type="character", default=getwd(), 
+                help="For probe processing, working directory is where annotationData/ and ReferenceFile/ are found"),
+    make_option(c("-s", "--seriesName"), type="character", default=NULL, 
+                help="series to process"),
+    make_option(c("-c", "--cleanup"), type="logical", default = TRUE,
+                help="clean up intermediate files in the plmData/ and probeData/; choose FALSE only for debug."),
+    make_option(c("-u", "--sourcedir"), type="character", default = getwd(),
+                help="source directory where Rpipeline/ is located"),
+    make_option(c("-m", "--memory"), type="integer", default = 50,
+                help="memory usage option. Probe processing is memory intensive. Generally for at most 8 threads, RAM 64GB -> 50, 96GB -> 80, 128GB -> 100."),
+    make_option(c("-f", "--force"), type="logical", default = TRUE,
+                help="skip checking if there're files unprocessed (and only process these) in the series, directly re-process and overwrite all arrays in series."),
+    make_option(c("-k", "--chipType"), type="character", default = "GenomeWideSNP_6",
+                help="SNP array platform name. Required for probe processing to determine reference file"),
+    make_option(c("-e", "--whichStep"), type="character", default = NULL,
+                help="which step to start: probe, segment, reseg, baseline, all."),
+    make_option(c("-p", "--filetype"), type="character", default = NULL,
+                help="process fracb or cn files."),
+    make_option(c("-d", "--undosd"), type="integer", default = 2,
+                help="for segmentation, lower difference of SD on neighboring segments will get removed."),
+    make_option(c("-r", "--useExtRef"), type="logical", default = TRUE,
+                help="for probe processing, external reference is used if there aren't at least 10 non-cancer samples in the series."),
+    make_option(c("-n", "--no_threads"), type="integer", default=1, 
+                help="total number of threads for this batch processing"),
+    make_option(c("-t", "--thread"), type="integer", default=0,
+                help="the thread for this process, value between 0 and (nt-1)"),
+    make_option(c("--post_process_dir"), type="character", default=NULL,
+                help="post processing(e.g. segment, reseg, baseline) at a different directory than $workingdir/processed")
+)
+ 
+opt_parser = OptionParser(option_list=option_list)
+opt = parse_args(opt_parser)
+print(opt)
+
+workingdir <- opt$workingdir
+seriesName <- opt$seriesName
+cleanup <- opt$cleanup
+sourcedir <- opt$sourcedir
+memory <- opt$memory
+force <- opt$force
+chipType <- opt$chipType
+whichStep <- opt$whichStep
+filetype <- opt$filetype
+undosd <- opt$undosd
+useExtRef <- opt$useExtRef
+no_threads <- opt$no_threads
+thread <- opt$thread
+post_process_dir <- opt$post_process_dir
+
 Pipelinedir <- file.path(sourcedir,'Rpipeline')
+
+if (is.null(whichStep)){
+    print_help(opt_parser)
+    stop('whichStep must be specified.', call.=FALSE)
+} 
+if (is.null(filetype)){
+    print_help(opt_parser)
+    stop('file type must be specified.', call.=FALSE)
+} 
+
+if (!whichStep %in% c('probe', 'segment', 'reseg', 'baseline', 'all')){
+    print_help(opt_parser)
+    stop('unrecognized whichStep input!', call.=FALSE)
+}
+
+if (!filetype %in% c('cn', 'fracb')){
+    print_help(opt_parser)
+    stop('unsupported file type.', call.=FALSE)
+}
+
+if (is.null(workingdir) & whichStep == 'probe'){
+    print_help(opt_parser)
+    stop('working directory must be specified for probe processing.', call.=FALSE)
+} 
+
+if (is.null(seriesName)){
+    print_help(opt_parser)
+    stop('series name must be specified.', call.=FALSE)
+} 
+
+
+if (is.null(post_process_dir)){
+    post_process_dir = file.path(workingdir, 'processed')
+}
+
+if (!dir.exists(Pipelinedir)){
+    stop('source directory is not correct!', call.=FALSE)
+}
+
 
 sapply(file.path(Pipelinedir,list.files(Pipelinedir)),source)
 
@@ -107,7 +183,7 @@ if (whichStep %in% c('probe', 'all')){
                                                       done;
                                                   done',localProcessPath))
                                 },error=function(e){
-                                                    message("Here's the original error message:")
+                                                    message("Here's the original error message from merging probes,fracb chromosomes:")
                                                     message(e,"\n")
                                                     return(paste0("Error\t",
                                                       format(Sys.time(), "%y-%m-%d %H:%M:%S"),
@@ -139,7 +215,7 @@ if (whichStep %in% c('probe', 'all')){
                                     done; 
                                 done',localProcessPath))
                 },error=function(e){
-                message("Here's the original error message:")
+                message("Here's the original error message from merging probes,cn chromosomes:")
                 message(e,"\n")
                 return(paste0("Error\t",format(Sys.time(), "%y-%m-%d %H:%M:%S"),"\t","CRMAv2\t",seriesName,"\t",e))}))
                 }
@@ -148,11 +224,11 @@ if (whichStep %in% c('probe', 'all')){
 ### segment ###
 if (whichStep %in% c('segment', 'all')){
 
-    cids <- list.files(localProcessPath)
+    cids <- list.files(file.path(post_process_dir, ser))
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
     cids <- cids[order(cids, decreasing = T)]
     print(paste("Segmentation for", length(cids), "samples."))
-    checkIncomplete <- function(force, localProcessPath){
+    checkIncomplete <- function(force, path){
         i <- 1
         notStarted <- 0
         if (force == 1) {
@@ -160,7 +236,7 @@ if (whichStep %in% c('segment', 'all')){
         } else {
             newcids = vector()
             for (i in 1:length(cids)){
-                if(!file.exists(file.path(localProcessPath,
+                if(!file.exists(file.path(path,
                                           cids[i],
                                           chooseFile(filetype,1)[[1]]))){
                     newcids <- c(newcids,cids[i])
@@ -171,7 +247,7 @@ if (whichStep %in% c('segment', 'all')){
 
     }
 
-    cids <- checkIncomplete(force,localProcessPath)
+    cids <- checkIncomplete(force,file.path(post_process_dir, seriesName))
     # print(length(cids))
     incomplete = length(cids) > 0
 
@@ -179,22 +255,24 @@ if (whichStep %in% c('segment', 'all')){
         for (cid in cids) {
             localsettings <- settings
             localsettings[['arrayName']] <- cid
-            localsettings[['remotedir']] <- file.path(getwd(),"processed") ## no remote directory in custom process
+            localsettings[['remotedir']] <- post_process_dir
             localsettings[['undosd']] <- undosd
             localsettings[['sourcedir']] <- NULL
             localsettings[['memory']] <- NULL
+            localsettings[['chipType']] <- NULL
             log <- c(log,tryCatch({do.call(get(sprintf('%ssegPerArray',filetype)),localsettings)},
                 error=function(e){
-                    message("Here's the original error message:")
+                    message(sprintf("Here's the original error message from %ssegPerArray:",filetype))
                     message(e,"\n")
                     return(paste0("Error\t",format(Sys.time(), "%y-%m-%d %H:%M:%S"),
                                 sprintf("\t%s segmentation\t",toupper(filetype)),
                                 seriesName,"\t",e))}))
             if (filetype == 'fracb'){
+                localsettings[['undosd']] <- NULL
                 log <- c(log, tryCatch( {
-                    BafAnalysis(seriesName=seriesName, chipType=chipType, arrayName=cid, remotedir=localProcessPath)
+                    do.call(BafAnalysis, localsettings)
                 }, error=function(e){
-                    message("Here's the original error message:")
+                    message("Here's the original error message from BafAnalysis:")
                     message(e,"\n")
                     return(paste0("Error\t",format(Sys.time(), "%y-%m-%d %H:%M:%S"),
                       "\tBAF analysis\t",seriesName,"\t",e))}))
@@ -206,7 +284,7 @@ if (whichStep %in% c('segment', 'all')){
 ### re-segment or evaluation ###
 if (whichStep %in% c('reseg', 'all')){
 
-    cids <- list.files(localProcessPath)
+    cids <- list.files(file.path(post_process_dir, seriesName))
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
 
     for (cid in cids) {
@@ -214,12 +292,12 @@ if (whichStep %in% c('reseg', 'all')){
         localsettings <- settings
         localsettings[['arrayName']] <- cid
         localsettings[['filename']] <- filetype
-        localsettings[['remotedir']] <- file.path(getwd(),"processed") ## no remote directory in custom process
+        localsettings[['remotedir']] <- post_process_dir
         localsettings[['sourcedir']] <- NULL
         localsettings[['memory']] <- NULL
         if (filetype == 'cn') {
             log <- c(log,tryCatch({
-                    logfile <- file.path(getwd(),"processed",seriesName,cid,sprintf('%sseg,log.txt',filetype))
+                    logfile <- file.path(post_process_dir,seriesName,cid,sprintf('%sseg,log.txt',filetype))
                     adj_probe <- ifelse(file.exists(logfile), length(grep("adjusted", readLines(logfile))) == 0, T)
                     print(paste("Adjust probe:", adj_probe))
                     do.call(adjustMedian,c(localsettings, adj_probe = adj_probe))
@@ -245,11 +323,11 @@ if (whichStep %in% c('reseg', 'all')){
 
 
 if (whichStep == "baseline") {
-    cids <- list.files(localProcessPath)
+    cids <- list.files(file.path(post_process_dir, seriesName))
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
     flag <- 0
     for (cid in cids) {
-        logfile <- file.path(getwd(),"processed",seriesName,cid,sprintf('%sseg,log.txt',filetype))
+        logfile <- file.path(post_process_dir,seriesName,cid,sprintf('%sseg,log.txt',filetype))
         adj_line <- grep("adjusted", readLines(logfile))
         offset_line <- grep("offset", readLines(logfile))
         # print(length(adj_line))

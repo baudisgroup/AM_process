@@ -2,13 +2,15 @@
 ### baf analysis final ###
 ##########################
 
-suppressWarnings(suppressMessages(library(plyr)))
+# suppressWarnings(suppressMessages(library(plyr)))
+suppressWarnings(suppressMessages(library(pastecs)))
 
-BafAnalysis <- function(seriesName,chipType,arrayName,remotedir,filename,workingdir) {
+BafAnalysis <- function(seriesName,arrayName,remotedir,workingdir) {
     options("scipen"=100, "digits"=4)
 
     cat("Processing sample:",arrayName,'\n')
     filelist <- list.files(paste(remotedir,seriesName,arrayName,sep="/"))
+
     if ('probes,fracb.tsv' %in% filelist){
         allfracb <- read.table(file.path(remotedir,seriesName,arrayName,'probes,fracb.tsv'),header=TRUE)
     } else {
@@ -18,10 +20,11 @@ BafAnalysis <- function(seriesName,chipType,arrayName,remotedir,filename,working
             allfracb <- rbind(allfracb,read.table(paste(remotedir,seriesName,arrayName,j,sep="/"),header=TRUE))
         }
     }
-
+    
     ## read the segments,fracB file; pre-filtering the segments.
+    print(file.path(remotedir,seriesName,arrayName,"fracbseg.tsv"))
     allseg <- read.table(file.path(remotedir,seriesName,arrayName,"fracbseg.tsv"),header=T)
-
+    print('here?2')
     Out <- file.path(remotedir,seriesName,arrayName,"segments,fracb.tsv")
     cat("ID","chr","loc.start","loc.end","fracB\n",sep="\t",file=Out,append=FALSE)
     for (chr in 1:23){

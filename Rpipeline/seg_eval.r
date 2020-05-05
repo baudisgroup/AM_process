@@ -31,7 +31,7 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
     # print(segStep)
     x = segStep[,valuecol]
     idx <- calculateLasso(segStep,lmd,filename)[[2]]
-    print(idx)
+    
     lmd <- calculateLasso(segStep,lmd,filename)[[3]]
     wm <- calculateWeightedMean(idx,segStep,filename)
 

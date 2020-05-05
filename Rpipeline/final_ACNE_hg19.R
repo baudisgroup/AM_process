@@ -1,5 +1,4 @@
 future::plan("multiprocess")
-setwd(workingdir)
   
 ACNE <- function(seriesName,chipType,workingdir,sourcedir,memory) {
     suppressWarnings(suppressMessages( library( aroma.affymetrix ) ) )
@@ -42,14 +41,14 @@ ACNE <- function(seriesName,chipType,workingdir,sourcedir,memory) {
 
 
     options("scipen" = 9, digits=4)
-    fn <- file.path(paste(getwd(),"processed",seriesName,sep="/"))
+    fn <- file.path(workingdir,"processed",seriesName)
     if (file.exists(fn) !=TRUE) dir.create(fn)
     for (chromosome in 1:23) {
         units <- getUnitsOnChromosome(gi, chromosome=chromosome)
         pos <- getPositions(gi, units=units)
         unitnames <- getUnitNames(cdf,units=units)
         for (ii in 1:length(cs$Names)){
-            Plotpath <- paste(getwd(),"processed",seriesName,cs$Names[ii],sep = "/")
+            Plotpath <- file.path(workingdir,"processed",seriesName,cs$Names[ii])
             if (chromosome==1) {
               dir.create(Plotpath)
             }
@@ -65,7 +64,7 @@ ACNE <- function(seriesName,chipType,workingdir,sourcedir,memory) {
             fracB$VALUE <- round(fracB$VALUE,4)
             write.table(fracB,sprintf("%s/probes,fracb,chr%d.tsv",Plotpath,chromosome),quote=F,sep="\t",row.names = F)
             cat(sprintf('%s/%s\n',seriesName,cs$Names[ii]),
-                file=file.path(getwd(),"processed",'logs','log_ACNE.txt'),append=T)
+                file=file.path(workingdir,"processed",'logs','log_ACNE.txt'),append=T)
         }
 
     }
