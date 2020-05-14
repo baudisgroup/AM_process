@@ -2,14 +2,9 @@
 ### affymetrix processing pipeline customed directory not GEO batch downloaded###
 #################################################################################
 
-# example usage
-# rscript --vanilla processPipeline_combined.r -w /Users/pgweb/arraydata/aroma/hg19 -s CHRO_cNHL -e segment -p cn
-# rscript --vanilla /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack/processPipeline_combined.r /Users/bgprocess/aroma/hg19/ METABRIC 1 /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack 80 1 GenomeWideSNP_6 probe cn 2 1
-# rscript --vanilla /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack/processPipeline_combined.r /Users/bgprocess/aroma/hg19/ METABRIC-1 0 /Users/bgprocess/Dropbox\ \(baudisgroup\)/baudisgroup/group/Qingyao/AromaPack 30 1 GenomeWideSNP_6 probe cn 2 1
-
 future::plan("multiprocess")
 library("optparse")
- 
+
 option_list = list(
     make_option(c("-w", "--workingdir"), type="character", default=getwd(), 
                 help="For probe processing, working directory is where annotationData/ and ReferenceFile/ are found"),
@@ -38,7 +33,9 @@ option_list = list(
     make_option(c("-t", "--thread"), type="integer", default=0,
                 help="the thread for this process, value between 0 and (nt-1)"),
     make_option(c("--post_process_dir"), type="character", default=NULL,
-                help="post processing(e.g. segment, reseg, baseline) at a different directory than $workingdir/processed")
+                help="post processing(e.g. segment, reseg, baseline) at a different directory than $workingdir/processed"),
+    make_option(c("-a", "--arrayName"), type="character", default=NULL,
+                help="for individual arrays analysis, available for segment or reseg steps, provide array names separated by comma")
 )
  
 opt_parser = OptionParser(option_list=option_list)
@@ -59,6 +56,9 @@ useExtRef <- opt$useExtRef
 no_threads <- opt$no_threads
 thread <- opt$thread
 post_process_dir <- opt$post_process_dir
+arrayName <- opt$arrayName
+
+# Rprof(paste0(Sys.getpid(),arrayName,'.log'), memory.profiling=TRUE)
 
 Pipelinedir <- file.path(sourcedir,'Rpipeline')
 
@@ -224,7 +224,12 @@ if (whichStep %in% c('probe', 'all')){
 ### segment ###
 if (whichStep %in% c('segment', 'all')){
 
-    cids <- list.files(file.path(post_process_dir, ser))
+    if (is.null(arrayName)){
+            cids <- list.files(file.path(post_process_dir, seriesName))
+        } else {
+            cids <- strsplit(arrayName, ',')[[1]]
+        }
+    
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
     cids <- cids[order(cids, decreasing = T)]
     print(paste("Segmentation for", length(cids), "samples."))
@@ -266,7 +271,7 @@ if (whichStep %in% c('segment', 'all')){
                     message(e,"\n")
                     return(paste0("Error\t",format(Sys.time(), "%y-%m-%d %H:%M:%S"),
                                 sprintf("\t%s segmentation\t",toupper(filetype)),
-                                seriesName,"\t",e))}))
+                                seriesName,"\t",cid,"\t",e))}))
             if (filetype == 'fracb'){
                 localsettings[['undosd']] <- NULL
                 log <- c(log, tryCatch( {
@@ -275,8 +280,9 @@ if (whichStep %in% c('segment', 'all')){
                     message("Here's the original error message from BafAnalysis:")
                     message(e,"\n")
                     return(paste0("Error\t",format(Sys.time(), "%y-%m-%d %H:%M:%S"),
-                      "\tBAF analysis\t",seriesName,"\t",e))}))
+                      "\tBAF analysis\t",seriesName,"\t",cid,"\t",e))}))
             }
+            gc()
         }
     }
 }
@@ -284,8 +290,13 @@ if (whichStep %in% c('segment', 'all')){
 ### re-segment or evaluation ###
 if (whichStep %in% c('reseg', 'all')){
 
-    cids <- list.files(file.path(post_process_dir, seriesName))
+    if (is.null(arrayName)){
+            cids <- list.files(file.path(post_process_dir, seriesName))
+        } else {
+            cids <- strsplit(arrayName, ',')[[1]]
+        }
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
+    cids <- cids[order(cids, decreasing = T)]
 
     for (cid in cids) {
         print(paste("Re-segmentation for:", cid))
@@ -298,7 +309,7 @@ if (whichStep %in% c('reseg', 'all')){
         if (filetype == 'cn') {
             log <- c(log,tryCatch({
                     logfile <- file.path(post_process_dir,seriesName,cid,sprintf('%sseg,log.txt',filetype))
-                    adj_probe <- ifelse(file.exists(logfile), length(grep("adjusted", readLines(logfile))) == 0, T)
+                    adj_probe <- ifelse(file.exists(logfile), length(grep("adjusted probe", readLines(logfile))) == 0, T)
                     print(paste("Adjust probe:", adj_probe))
                     do.call(adjustMedian,c(localsettings, adj_probe = adj_probe))
 
@@ -311,7 +322,7 @@ if (whichStep %in% c('reseg', 'all')){
                 }, error=function(e){
                     message('Error! ',e,'\n')
                     return(paste0("Error\t",format(Sys.time(), "%y-%m-%d %H:%M:%S"),
-                      "\t",seriesName,"\t",e))}
+                      "\t",seriesName,"\t",cid,"\t",e))}
                 )
             )
         }
@@ -323,40 +334,56 @@ if (whichStep %in% c('reseg', 'all')){
 
 
 if (whichStep == "baseline") {
-    cids <- list.files(file.path(post_process_dir, seriesName))
+    if (is.null(arrayName)){
+            cids <- list.files(file.path(post_process_dir, seriesName))
+        } else {
+            cids <- strsplit(arrayName, ',')[[1]]
+        }
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
+    cids <- cids[order(cids, decreasing = T)]
+    
     flag <- 0
     for (cid in cids) {
-        logfile <- file.path(post_process_dir,seriesName,cid,sprintf('%sseg,log.txt',filetype))
-        adj_line <- grep("adjusted", readLines(logfile))
+        logfile <- file.path(post_process_dir,seriesName,cid,'cnseg,log.txt')
+        adj_probe <- ifelse(file.exists(logfile), length(grep("adjusted probe", readLines(logfile))) == 0, T)
+        print(paste("Adjust probe:", adj_probe))
+        localsettings <- settings
+        localsettings[['arrayName']] <- cid
+        localsettings[['filename']] <- 'cn'
+        localsettings[['remotedir']] <- post_process_dir
+        localsettings[['sourcedir']] <- NULL
+        localsettings[['memory']] <- NULL
+        do.call(adjustMedian,c(localsettings, adj_probe = adj_probe))
+        adj_line <- grep("adjusted probe", readLines(logfile))
         offset_line <- grep("offset", readLines(logfile))
         # print(length(adj_line))
         if (length(adj_line) > 1 & length(offset_line) == 0) {
-            print(paste("Adjust baseline for:", cid))
+            print(paste("Re-adjust baseline for:", cid))
             adj_val <- strsplit(readLines(logfile)[adj_line[1]], "median: ")[[1]][2]
 
             ### re-adjust probe file
             offset <- (length(adj_line) - 1) * as.numeric(adj_val)
             # print(offset)
             probename <- chooseFile(filetype,1)[[4]]
-            probefile <- read.table(file.path(getwd(), "processed", seriesName, cid, probename), 
+            probefile <- read.table(file.path(post_process_dir, seriesName, cid, probename), 
                 header = T, stringsAsFactors = F)
             probefile <- probefile[probefile[,1] != colnames(probefile)[1], ]
             probefile[,4] <- as.numeric(probefile[,4])
             probefile <- probefile[!is.na(probefile[,4]),]
-            probefile[,4] <- probefile[,4] + offset
+            probefile[,4] <- round(probefile[,4] + offset,4)
             # print(head(probefile))
 
-            write.table(probefile,file.path(getwd(), "processed", seriesName, cid, probename), 
+            write.table(probefile,file.path(post_process_dir, seriesName, cid, probename), 
                 sep="\t", quote=FALSE,row.names=FALSE)
             cat(as.character(Sys.time()), sprintf("offset probe values with: %s \n", offset), 
                 file=logfile,append = T)
-
+            gc()
         }
     }
 }
 
-
-dir.create(paste0(workingdir,"/processed/",seriesName),showWarnings = F)
 write.table(paste0(log),paste0(workingdir,"/processed/aroma_",format(Sys.time(), "%y-%m-%d"),".log")
     ,quote=F,row.names = F,col.names = F,append=T)
+# Rprof()
+# summaryRprof(paste0(Sys.getpid(),arrayName,'.log'), memory = "stats", diff = F)#memory = 'both'
+gc()

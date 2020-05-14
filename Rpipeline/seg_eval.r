@@ -148,6 +148,8 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
     logfile <- file.path(remotedir,seriesName,arrayName,sprintf('%sseg,log.txt',filename))
     cat(as.character(Sys.time()), 'stepFilter warning:', paste(log, collapse='; '), '\n',sep='\t', file=logfile,append = T)
     cat(as.character(Sys.time()), sprintf("filtered segments with gap size = %s, lambda = %s, previous %s segments, now %s segments, %s indices \n",gp,lmd,length(x),nrow(newseg),length(idx)),sep='\t',file=logfile,append = T)
+    # rm(list=ls())
+    gc()
 }
 
 calculateLasso <- function(segmentData, lmd, filename) {

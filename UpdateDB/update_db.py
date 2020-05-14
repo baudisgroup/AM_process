@@ -9,7 +9,7 @@ import logging
 @click.option('-dbout', '--output_db', default='', multiple=True, help='The database to write into.')
 @click.option('-s', '--sers', default=[], multiple=True, help='Series to process.')
 @click.option('-a', '--arrs', default=[], multiple=True, help='Array to process. If this is provided, then only one series is accepted.')
-@click.option('-r', '--rootdir', default = '/Volumes/arrayMaster/arraymap/grch38/', help='Provide root directory where variants.json and callset.json should be loaded, until the level grch38/.')
+@click.option('-r', '--rootdir', default = '/Volumes/arrayData/arraymap/grch38/', help='Provide root directory where variants.json and callset.json should be loaded, until the level grch38/.')
 @click.option('--overwrite/--no-overwrite', default=False,  help='default write into temporary collections; if flagged, overwrite current collection')
 def cli(output_db, sers, arrs, rootdir, overwrite):
 

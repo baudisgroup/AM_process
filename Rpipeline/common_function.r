@@ -30,19 +30,19 @@ chooseFile <- function(filename,provenance){
     return (list(name, valuecol, probecol, probename))
 }
 
-adjustMedian <- function(remotedir,seriesName,arrayName,workingdir,chipType,filename,adj_probe){
+adjustMedian <- function(remotedir,seriesName,arrayName,workingdir,filename,chipType,adj_probe){
     name <- chooseFile(filename,1) [[1]]
+    newname <- chooseFile(filename,0) [[1]]
     if (!file.exists(file.path(remotedir,seriesName,arrayName,name))){
-        newname <- chooseFile(filename,0) [[1]]
         file.copy(file.path(remotedir,seriesName,arrayName,newname),
         file.path(remotedir,seriesName,arrayName,name), overwrite = F)
     }
     valuecol <- chooseFile(filename,1) [[2]]
-    segfile <- read.table(file.path(remotedir,seriesName,arrayName,name),header = T,stringsAsFactors = F)
+    segfile <- read.table(file.path(remotedir,seriesName,arrayName,newname),header = T,stringsAsFactors = F)
     colnames(segfile) <- c('sample_id','chromosome','start','end','value','probes')
 
-    med <- round(weightedMedian(segfile[,valuecol],segfile[,valuecol+1]),4)
-    segfile[,valuecol] <- segfile[,valuecol]-med
+    med <- round(weightedMedian(segfile[,valuecol],segfile[,valuecol+1]),5)
+    segfile[,valuecol] <- round(segfile[,valuecol]-med,4)
     newname <-chooseFile(filename,0) [[1]]
     write.table(segfile,file=file.path(remotedir,seriesName,arrayName,newname), sep="\t", quote=FALSE,row.names=FALSE)
 
@@ -55,7 +55,7 @@ adjustMedian <- function(remotedir,seriesName,arrayName,workingdir,chipType,file
         probefile <- probefile[probefile[,1] != colnames(probefile)[1], ]
         probefile[,4] <- as.numeric(probefile[,4])
         probefile <- probefile[!is.na(probefile[,4]),]
-        probefile[,4] <- probefile[,4] -med
+        probefile[,4] <- round(probefile[,4] -med,4)
         write.table(probefile,file.path(remotedir,seriesName,arrayName,probename), 
             sep="\t", quote=FALSE,row.names=FALSE)
         cat(as.character(Sys.time()), 
@@ -66,6 +66,8 @@ adjustMedian <- function(remotedir,seriesName,arrayName,workingdir,chipType,file
             sprintf("adjusted segment values with median: %s without adjusting probes\n",med), 
             file=logfile,append = T)
     }
+    rm(list=ls())
+    gc()
 }
 
 rmGaps <- function(remotedir,seriesName,arrayName,workingdir,chipType,filename){
@@ -115,4 +117,6 @@ rmGaps <- function(remotedir,seriesName,arrayName,workingdir,chipType,filename){
     logfile <- file.path(remotedir,seriesName,arrayName,sprintf('%sseg,log.txt',filename))
     cat(as.character(Sys.time()), sprintf("removed centromere gaps, now %s segments.\n", nrow(newfile)), 
         file=logfile, append = T)
+    rm(list=ls())
+    gc()
 }

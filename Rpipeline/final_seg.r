@@ -49,6 +49,8 @@ cnsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd){
     }
     logfile <- file.path(remotedir,seriesName,arrayName,'cnseg,log.txt')
     cat(as.character(Sys.time()), sprintf("undosd = %s\n",undosd), file=logfile, append=T)
+    rm(list=ls())
+    gc()
 }
 
 ############################
@@ -113,4 +115,6 @@ fracbsegPerArray <- function(workingdir,remotedir,seriesName, arrayName, undosd)
                     append = T, row.names=FALSE, col.names=F)
 
     }
+    rm(list=ls())
+    gc()
 }
