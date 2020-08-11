@@ -1,6 +1,7 @@
 suppressWarnings(suppressMessages(library(genlasso)))
 options("scipen"=100, "digits"=4)
 
+### does not allow between-chromosome merging
 getLmd <- function(remotedir,seriesName,arrayName,workingdir,chipType,filename){
   name <- chooseFile(filename,1) [[1]]
   segfile <- read.table(file.path(remotedir,seriesName,arrayName,name),header = T,stringsAsFactors = F)
@@ -8,7 +9,7 @@ getLmd <- function(remotedir,seriesName,arrayName,workingdir,chipType,filename){
   lmdtable <- data.frame('cn'=c(0,0.3,0.5,1),'fracb'=c(0,0.05,0.075,0.2))
   if (noseg < 200) {
     l <- lmdtable[filename][1,]
-  } else if(noseg <500){
+  } else if(noseg <600){
     l <- lmdtable[filename][2,]
   } else if(noseg <1000){
     l <- lmdtable[filename][3,]
@@ -31,10 +32,8 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
     # print(segStep)
     x = segStep[,valuecol]
     idx <- calculateLasso(segStep,lmd,filename)[[2]]
+    # cat('ori_idx',length(idx),idx)
     
-    lmd <- calculateLasso(segStep,lmd,filename)[[3]]
-    wm <- calculateWeightedMean(idx,segStep,filename)
-
     ##chipType CHRO chr_start chr_end probes
     seg <- read.table(segmentFile,stringsAsFactors = F,header = T)
     if (!is.numeric(seg[,2]))  seg[,2] <- as.numeric(convertXYM(seg[,2]))
@@ -50,10 +49,20 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
                     chr_start = chr_start,
                     chr_end = chr_end,
                     probes = probes)
-    write.table(chrPos, 'debug.log')
 
     newseg <- data.frame()
-    idx <- c(idx,nrow(segStep)) ##each idx is the end of segment and add the last row of all segments
+    ### add all chromosome end index
+    chro_end_idx <- NULL
+    for (i in CHRO){
+      chro_idx <- which(segStep[,2] == i)
+      chro_end_idx <- c(chro_end_idx, chro_idx[length(chro_idx)])
+    }
+    idx <- sort(union(c(idx,chro_end_idx),nrow(segStep)))
+    lmd <- calculateLasso(segStep,lmd,filename)[[3]]
+    wm <- calculateWeightedMean(idx,segStep,filename)
+
+    ##each idx is the end of segment and add the last row of all segments
+    # cat('new_idx',length(idx),idx)
     for (i in 1:length(idx)){
         if (i==1){
             countProbes <- 0 ## count probes that are in the hidden segments
@@ -154,16 +163,25 @@ stepFilter <- function(remotedir,seriesName,arrayName,workingdir,chipType,gp,lmd
 
 calculateLasso <- function(segmentData, lmd, filename) {
   valuecol <- chooseFile(filename,1)[[2]]
+  probecol <- chooseFile(filename,1)[[3]]
   set.seed(1)
   x <- segmentData[,valuecol]
+  # ### add repeats by log number of probes
+  # rep_idx <- round(log10(segmentData[,probecol]))
+
+  # idx_expand <- unlist(lapply(1:nrow(segmentData), function(i) rep(i,rep_idx[i])))
+  # print(idx_expand)
+  # x <- x[idx_expand]
+  # print(x)
   out = fusedlasso1d(x)
   minl <- min(out$lambda)
-  lmd <- max(minl,lmd)
+  lmd <- max(minl,0.3)#minl
   beta1 = coef(out, lambda=lmd)$beta
 
-  ## calculate weighted mean in each segment
   beta1 <- round(beta1,4)
   idx = which(abs(diff(beta1)) > 1e-4)
+  # ### convert repeated idx back to original
+  # idx = unique(rep_idx[idx])
   return(list(beta1,idx,lmd))
 }
 
@@ -196,6 +214,7 @@ stepwiseDifference <- function(gapSize,segmentFile,filename){
   for (row in 1:nrow(seg)){ ###work on this to add the probe number from the removed small segments
     segLen <- seg[row,4]-seg[row,3]
     # if (is.na(segLen)) print(seg)
+    # print(segLen)
     if ( segLen> gapSize) {
       accumulatePos <- accumulatePos + segLen
       tmpseg<-cbind(accumulatePos,seg[row,c(1:6)])

@@ -362,20 +362,17 @@ for count,serarr in enumerate(serarrs):
             gender = ''
 
 
-
-
-    # print('\n'.join([gseID,gsmID,platID,diagnosis,sample_type,series_title,sample_title,stage,infochannel_1,infochannel_2,charchannel_1,charchannel_2,source,age,gender,city,country,year,pubmedID,organism]))
-#GEOSUBMISSION
-# GEOUPDATEDATE
-# CONTACTNAME
-# CONTACTEMAIL
-# BIOPROJECT
     if not os.path.isfile(outputpath):
         with open(outputpath,'w') as wf:
-            wf.write('\t'.join(['STATUS','SERIESID','UID','PLATFORMID','DIAGNOSISTEXT','DIAGNOSISTEXT_original','ICDMORPHOLOGY','ICDMORPHOLOGYCODE','ICDTOPOGRAPHY','ICDTOPOGRAPHYCODE','TECHNOLOGY','SERIES_TITLE', 'BIOPROJECT','SAMPLE_TITLE','TNM','CHANNEL_CANCER','INFORCHANNEL_1','INFORCHANNEL_2','CHAR_CHANNEL_1','CHAR_CHANNEL_2','SAMPLESOURCE','CELLLINEID','CELLOSAURUSID'
-            ,'AGE','SEX','CITY','COUNTRY','YEAR','PMID','ORGANISM'])+'\n')
+            wf.write('\t'.join(['STATUS','SERIESID','UID','PLATFORMID','DIAGNOSISTEXT','DIAGNOSISTEXT_original',
+                'ICDMORPHOLOGY','ICDMORPHOLOGYCODE','ICDTOPOGRAPHY','ICDTOPOGRAPHYCODE','TECHNOLOGY','SERIES_TITLE', 
+                'BIOPROJECT','SAMPLE_TITLE','TNM','CHANNEL_CANCER','INFORCHANNEL_1','INFORCHANNEL_2','CHAR_CHANNEL_1',
+                'CHAR_CHANNEL_2','SAMPLESOURCE','CELLLINEID','CELLOSAURUSID','AGE','SEX','CITY','COUNTRY','YEAR',
+                'PMID','ORGANISM'])+'\n')
     with open(outputpath,'a') as wf:
-        wf.write('\t'.join(['',gseID,gsmID,platID,'',diagnosis,'','','','','in situ oligonucleotide',series_title,bioproject,sample_title,stage,'',infochannel_1,infochannel_2,charchannel_1,charchannel_2,source,'','',age,gender,city,country,year,pubmedID,organism])+'\n')
+        wf.write('\t'.join(['',gseID,gsmID,platID,'',diagnosis,'','','','','in situ oligonucleotide',series_title,
+                            bioproject,sample_title,stage,'',infochannel_1,infochannel_2,charchannel_1,
+                            charchannel_2,source,'','',age,gender,city,country,year,pubmedID,organism])+'\n')
     with open('done.log','a') as wf:
         wf.write(serarr+'\n')
 

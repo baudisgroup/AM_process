@@ -4,6 +4,7 @@
 
 # suppressWarnings(suppressMessages(library(plyr)))
 suppressWarnings(suppressMessages(library(pastecs)))
+require(pastecs)
 
 BafAnalysis <- function(seriesName,arrayName,remotedir,workingdir) {
     options("scipen"=100, "digits"=4)
@@ -24,7 +25,7 @@ BafAnalysis <- function(seriesName,arrayName,remotedir,workingdir) {
     ## read the segments,fracB file; pre-filtering the segments.
     print(file.path(remotedir,seriesName,arrayName,"fracbseg.tsv"))
     allseg <- read.table(file.path(remotedir,seriesName,arrayName,"fracbseg.tsv"),header=T)
-    print('here?2')
+    
     Out <- file.path(remotedir,seriesName,arrayName,"segments,fracb.tsv")
     cat("ID","chr","loc.start","loc.end","fracB\n",sep="\t",file=Out,append=FALSE)
     for (chr in 1:23){
@@ -41,7 +42,6 @@ BafAnalysis <- function(seriesName,arrayName,remotedir,workingdir) {
         dens <- density(subfracb$VALUE)
         y <- dens$y
         x <- dens$x
-        require(pastecs)
         tp<-turnpoints(y)
         peak <- x[tp$peaks]
         peak <- sort(c(peak,1-peak))

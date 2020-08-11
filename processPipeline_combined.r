@@ -24,7 +24,7 @@ option_list = list(
                 help="which step to start: probe, segment, reseg, baseline, all."),
     make_option(c("-p", "--filetype"), type="character", default = NULL,
                 help="process fracb or cn files."),
-    make_option(c("-d", "--undosd"), type="integer", default = 2,
+    make_option(c("-d", "--undosd"), type="integer", default = 1,
                 help="for segmentation, lower difference of SD on neighboring segments will get removed."),
     make_option(c("-r", "--useExtRef"), type="logical", default = TRUE,
                 help="for probe processing, external reference is used if there aren't at least 10 non-cancer samples in the series."),
