@@ -6,9 +6,9 @@ future::plan("multiprocess")
 library("optparse")
 
 option_list = list(
-    make_option(c("-w", "--workingdir"), type="character", default=getwd(), 
+    make_option(c("-w", "--workingdir"), type="character", default=getwd(),
                 help="For probe processing, working directory is where annotationData/ and ReferenceFile/ are found"),
-    make_option(c("-s", "--seriesName"), type="character", default=NULL, 
+    make_option(c("-s", "--seriesName"), type="character", default=NULL,
                 help="series to process"),
     make_option(c("-c", "--cleanup"), type="logical", default = TRUE,
                 help="clean up intermediate files in the plmData/ and probeData/; choose FALSE only for debug."),
@@ -28,7 +28,7 @@ option_list = list(
                 help="for segmentation, lower difference of SD on neighboring segments will get removed."),
     make_option(c("-r", "--useExtRef"), type="logical", default = TRUE,
                 help="for probe processing, external reference is used if there aren't at least 10 non-cancer samples in the series."),
-    make_option(c("-n", "--no_threads"), type="integer", default=1, 
+    make_option(c("-n", "--no_threads"), type="integer", default=1,
                 help="total number of threads for this batch processing"),
     make_option(c("-t", "--thread"), type="integer", default=0,
                 help="the thread for this process, value between 0 and (nt-1)"),
@@ -37,7 +37,7 @@ option_list = list(
     make_option(c("-a", "--arrayName"), type="character", default=NULL,
                 help="for individual arrays analysis, available for segment or reseg steps, provide array names separated by comma")
 )
- 
+
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 print(opt)
@@ -65,11 +65,11 @@ Pipelinedir <- file.path(sourcedir,'Rpipeline')
 if (is.null(whichStep)){
     print_help(opt_parser)
     stop('whichStep must be specified.', call.=FALSE)
-} 
+}
 if (is.null(filetype)){
     print_help(opt_parser)
     stop('file type must be specified.', call.=FALSE)
-} 
+}
 
 if (!whichStep %in% c('probe', 'segment', 'reseg', 'baseline', 'all')){
     print_help(opt_parser)
@@ -84,12 +84,12 @@ if (!filetype %in% c('cn', 'fracb')){
 if (is.null(workingdir) & whichStep == 'probe'){
     print_help(opt_parser)
     stop('working directory must be specified for probe processing.', call.=FALSE)
-} 
+}
 
 if (is.null(seriesName)){
     print_help(opt_parser)
     stop('series name must be specified.', call.=FALSE)
-} 
+}
 
 
 if (is.null(post_process_dir)){
@@ -124,7 +124,7 @@ for(i in 1:length(cids)){
 
         for (chr in 1:23){
 
-            checked_file <- file.path(localProcessPath,cids[i],sprintf(namestructure,chr))  
+            checked_file <- file.path(localProcessPath,cids[i],sprintf(namestructure,chr))
             if(!file.exists(checked_file)) {
 
                 incomplete <- 1
@@ -155,12 +155,11 @@ if (whichStep %in% c('probe', 'all')){
 
     cids <- gsub(".CEL","",files)
 
-    fracbIncomplete <- force | checkCHRIncomplete('probes,fracb,chr%s.tsv')
-    cnIncomplete <- force | checkCHRIncomplete('probes,cn,chr%s.tsv')
+    fracbIncomplete <- force | checkCHRIncomplete('probes,fracb,chr%s.tsv', cids)
+    cnIncomplete <- force | checkCHRIncomplete('probes,cn,chr%s.tsv', cids)
     message("fracb",fracbIncomplete)
     message("cn",cnIncomplete)
-
-    if (!chipType %in% list.files(file.path(getwd(),"annotationData","chipTypes"))) stop("chipType not available")
+    if (!chipType %in% list.files(file.path(workingdir,"annotationData","chipTypes"))) stop("chipType not available")
 
       if (fracbIncomplete) {
 
@@ -176,11 +175,12 @@ if (whichStep %in% c('probe', 'all')){
                                         }
                                     }
                                 }
-                                system(sprintf('for i in %s/*/; 
-                                                  do cp $i/probes,fracb,chr1.tsv $i/probes,fracb.tsv; 
-                                                  for j in {2..23}; 
-                                                      do tail -n +2 $i/probes,fracb,chr$j.tsv >> $i/probes,fracb.tsv; 
+                                system(sprintf('for i in %s/*/;
+                                                  do cp $i/probes,fracb,chr1.tsv $i/probes,fracb.tsv;
+                                                  for j in {2..23};
+                                                      do tail -n +2 $i/probes,fracb,chr$j.tsv >> $i/probes,fracb.tsv;
                                                       done;
+                                                  rm $i/probes,fracb,chr*;
                                                   done',localProcessPath))
                                 },error=function(e){
                                                     message("Here's the original error message from merging probes,fracb chromosomes:")
@@ -209,10 +209,11 @@ if (whichStep %in% c('probe', 'all')){
                     }
                 }
                 system(sprintf('for i in %s/*/;
-                                    do cp $i/probes,cn,chr1.tsv $i/probes,cn.tsv; 
-                                    for j in {2..23}; 
-                                        do tail -n +2 $i/probes,cn,chr$j.tsv >> $i/probes,cn.tsv; 
-                                    done; 
+                                    do cp $i/probes,cn,chr1.tsv $i/probes,cn.tsv;
+                                    for j in {2..23};
+                                        do tail -n +2 $i/probes,cn,chr$j.tsv >> $i/probes,cn.tsv;
+                                    done;
+                                    rm $i/probes,cn,chr*;
                                 done',localProcessPath))
                 },error=function(e){
                 message("Here's the original error message from merging probes,cn chromosomes:")
@@ -229,7 +230,7 @@ if (whichStep %in% c('segment', 'all')){
         } else {
             cids <- strsplit(arrayName, ',')[[1]]
         }
-    
+
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
     cids <- cids[order(cids, decreasing = T)]
     print(paste("Segmentation for", length(cids), "samples."))
@@ -341,7 +342,7 @@ if (whichStep == "baseline") {
         }
     cids <- cids[which(1:length(cids) %% no_threads == thread)]
     cids <- cids[order(cids, decreasing = T)]
-    
+
     flag <- 0
     for (cid in cids) {
         logfile <- file.path(post_process_dir,seriesName,cid,'cnseg,log.txt')
@@ -365,7 +366,7 @@ if (whichStep == "baseline") {
             offset <- (length(adj_line) - 1) * as.numeric(adj_val)
             # print(offset)
             probename <- chooseFile(filetype,1)[[4]]
-            probefile <- read.table(file.path(post_process_dir, seriesName, cid, probename), 
+            probefile <- read.table(file.path(post_process_dir, seriesName, cid, probename),
                 header = T, stringsAsFactors = F)
             probefile <- probefile[probefile[,1] != colnames(probefile)[1], ]
             probefile[,4] <- as.numeric(probefile[,4])
@@ -373,9 +374,9 @@ if (whichStep == "baseline") {
             probefile[,4] <- round(probefile[,4] + offset,4)
             # print(head(probefile))
 
-            write.table(probefile,file.path(post_process_dir, seriesName, cid, probename), 
+            write.table(probefile,file.path(post_process_dir, seriesName, cid, probename),
                 sep="\t", quote=FALSE,row.names=FALSE)
-            cat(as.character(Sys.time()), sprintf("offset probe values with: %s \n", offset), 
+            cat(as.character(Sys.time()), sprintf("offset probe values with: %s \n", offset),
                 file=logfile,append = T)
             gc()
         }

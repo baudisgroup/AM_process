@@ -1,10 +1,11 @@
 future::plan("multiprocess")
-  
+
 ACNE <- function(seriesName,chipType,workingdir,sourcedir,memory) {
     suppressWarnings(suppressMessages( library( aroma.affymetrix ) ) )
     suppressWarnings(suppressMessages( library( ACNE ) ) )
     setOption(aromaSettings, "memory/ram", memory)
-
+    setwd(workingdir)
+    
     verbose <- Arguments$getVerbose(100, timestamp=TRUE)
 
     if (chipType %in% c("GenomeWideSNP_6","GenomeWideSNP_5")){cdf <- AffymetrixCdfFile$byChipType(chipType, tags="Full")
