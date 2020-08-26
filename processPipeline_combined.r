@@ -16,7 +16,7 @@ option_list = list(
                 help="source directory where Rpipeline/ is located"),
     make_option(c("-m", "--memory"), type="integer", default = 50,
                 help="memory usage option. Probe processing is memory intensive. Generally for at most 8 threads, RAM 64GB -> 50, 96GB -> 80, 128GB -> 100."),
-    make_option(c("-f", "--force"), type="logical", default = TRUE,
+    make_option(c("-f", "--force"), type="logical", default = FALSE,
                 help="skip checking if there're files unprocessed (and only process these) in the series, directly re-process and overwrite all arrays in series."),
     make_option(c("-k", "--chipType"), type="character", default = "GenomeWideSNP_6",
                 help="SNP array platform name. Required for probe processing to determine reference file"),
@@ -116,22 +116,20 @@ settings = list (
 print(settings)
 
 ### check if processed probe files are complete
-checkCHRIncomplete <- function(namestructure, cids) {
+checkFileIncomplete <- function(filename, cids) {
 incomplete <- 0
 for(i in 1:length(cids)){
 
     if (incomplete == 0){
 
-        for (chr in 1:23){
+          checked_file <- file.path(localProcessPath,cids[i],filename)
+          if(!file.exists(checked_file)) {
 
-            checked_file <- file.path(localProcessPath,cids[i],sprintf(namestructure,chr))
-            if(!file.exists(checked_file)) {
+              incomplete <- 1
 
-                incomplete <- 1
-
-            break
-          }
+          break
         }
+
 
     }
   }
@@ -155,8 +153,8 @@ if (whichStep %in% c('probe', 'all')){
 
     cids <- gsub(".CEL","",files)
 
-    fracbIncomplete <- force | checkCHRIncomplete('probes,fracb,chr%s.tsv', cids)
-    cnIncomplete <- force | checkCHRIncomplete('probes,cn,chr%s.tsv', cids)
+    fracbIncomplete <- force | checkFileIncomplete('probes,fracb.tsv', cids)
+    cnIncomplete <- force | checkFileIncomplete('probes,cn.tsv', cids)
     message("fracb",fracbIncomplete)
     message("cn",cnIncomplete)
     if (!chipType %in% list.files(file.path(workingdir,"annotationData","chipTypes"))) stop("chipType not available")
