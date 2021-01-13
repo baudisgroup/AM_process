@@ -130,7 +130,16 @@ for count,serarr in enumerate(serarrs):
     try:
         with open(os.path.join('/Volumes/arraymapIncoming/GEOmeta/',gseID,'geometa.soft'),'r') as f:
             text = f.read()
-    except:
+
+        ## check file sanity
+        if not text.startswith('^SERIES'):
+            with open('wrongMetaFileFormat.log', 'a') as wf:
+                wf.write(serarr+'\n')
+            continue
+
+    except FileNotFoundError:
+        with open('notFound.log','a') as wf:
+            wf.write(serarr+'\n')
         continue
     lines = nltk.line_tokenize(text)
     series_title = getDescriptionfromLine(lines,'!Series_title')
@@ -140,10 +149,16 @@ for count,serarr in enumerate(serarrs):
         # print(serarr)
     try:
         with open(os.path.join('/Volumes/arraymapIncoming/GEOmeta/',serarr,'geometa.soft'),'r') as f:
-            if text:
-                text += f.read()
-            else:
-                text = f.read()
+            content = f.read()
+
+            ## check file sanity
+            if not content.startswith('^SAMPLE'):
+                with open('wrongMetaFileFormat.log', 'a') as wf:
+                    wf.write(serarr+'\n')
+                continue
+                
+            text += content
+
     except:
         with open('notFound.log','a') as wf:
             wf.write(serarr+'\n')

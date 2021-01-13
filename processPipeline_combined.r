@@ -71,7 +71,7 @@ if (is.null(filetype)){
     stop('file type must be specified.', call.=FALSE)
 }
 
-if (!whichStep %in% c('probe', 'segment', 'reseg', 'baseline', 'all')){
+if (!whichStep %in% c('probe', 'segment', 'reseg', 'baseline', 'LOH','all')){
     print_help(opt_parser)
     stop('unrecognized whichStep input!', call.=FALSE)
 }
@@ -331,6 +331,22 @@ if (whichStep %in% c('reseg', 'all')){
     }
 }
 
+if (whichStep %in% c("LOH", "all")) {
+    if (is.null(arrayName)){
+      cids <- list.files(file.path(post_process_dir, seriesName))
+    } else {
+      cids <- strsplit(arrayName, ',')[[1]]
+    }
+    cids <- cids[which(1:length(cids) %% no_threads == thread)]
+    cids <- cids[order(cids, decreasing = T)]
+    for (cid in cids) {
+        logfile <- file.path(post_process_dir,seriesName,cid,'fracbseg,log.txt')
+        write('Compute LOH from fracB:', logfile, append = T)
+        dir_path <- file.path(post_process_dir,seriesName,cid)
+        out <- combine_seg_peak_finder(dir_path)
+        output_loh_with_model_validation(dir_path, out, logfile)
+    }
+}
 
 if (whichStep == "baseline") {
     if (is.null(arrayName)){
@@ -383,6 +399,4 @@ if (whichStep == "baseline") {
 
 write.table(paste0(log),paste0(workingdir,"/processed/aroma_",format(Sys.time(), "%y-%m-%d"),".log")
     ,quote=F,row.names = F,col.names = F,append=T)
-# Rprof()
-# summaryRprof(paste0(Sys.getpid(),arrayName,'.log'), memory = "stats", diff = F)#memory = 'both'
 gc()
