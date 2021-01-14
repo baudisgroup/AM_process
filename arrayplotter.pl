@@ -51,11 +51,12 @@ BEGIN {
   push @INC, $path_of_this_module.'/../..';
 }
 
-use PGX::PGX;
-use PGX::GenomeIntervals;
-use PGX::ArrayPlotter;
-use PGX::CytobandReader;
-use PGX::Genomeplot;
+use lib './PGX';
+use PGX;
+use GenomeIntervals;
+use ArrayPlotter;
+use CytobandReader;
+use Genomeplot;
 
 # command line input
 

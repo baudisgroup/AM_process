@@ -1,16 +1,17 @@
-package PGX::PGXfileReader;
+package PGXfileReader;
 
 use Data::Dumper;
 use Math::Random qw(random_normal);
 
-require Exporter;
-@ISA    =   qw(Exporter);
-@EXPORT =   qw(
-  read_probefile
-  read_segmentfile
-  read_file_to_split_array
-  read_webfile_to_split_array
-);
+use Exporter::Auto;
+# require Exporter;
+# @ISA    =   qw(Exporter);
+# @EXPORT =   qw(
+#   read_probefile
+#   read_segmentfile
+#   read_file_to_split_array
+#   read_webfile_to_split_array
+# );
 
 ################################################################################
 

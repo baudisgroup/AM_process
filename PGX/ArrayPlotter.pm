@@ -1,12 +1,13 @@
-package PGX::ArrayPlotter;
+package ArrayPlotter;
 
 use Data::Dumper;
 use GD::Simple;
 use MIME::Base64 qw(encode_base64);
 use YAML::XS qw(LoadFile DumpFile);
-use PGX::CytobandsPlotter;
+use CytobandsPlotter;
 # use PGX::GenomePlots::PlotParameters;
 
+# use Exporter::Auto;
 require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = qw(

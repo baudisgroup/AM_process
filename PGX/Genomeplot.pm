@@ -1,25 +1,26 @@
-package PGX::Genomeplot;
+package Genomeplot;
 
 use strict;
 use warnings;
 use Data::Dumper;
-use PGX::CytobandReader;
-use PGX::GenomeIntervals;
-use PGX::ArrayPlotter;
-use PGX::PGXfileReader;
+use CytobandReader;
+use GenomeIntervals;
+use ArrayPlotter;
+use PGXfileReader;
 
-require Exporter;
-our @ISA    =   qw(Exporter);
-our @EXPORT =   qw(
-  pgx_add_frequencymaps
-  pgx_add_probes_from_file
-  pgx_add_segments_from_file
-  pgx_add_segmentsets_from_samples
-  pgx_add_fracbprobes_from_file
-  pgx_add_fracbsegments_from_file
-  plot_adjust_random_probevalues
-  pgx_get_genome_regions
-);
+use Exporter::Auto;
+# require Exporter;
+# our @ISA    =   qw(Exporter);
+# our @EXPORT =   qw(
+#   pgx_add_frequencymaps
+#   pgx_add_probes_from_file
+#   pgx_add_segments_from_file
+#   pgx_add_segmentsets_from_samples
+#   pgx_add_fracbprobes_from_file
+#   pgx_add_fracbsegments_from_file
+#   plot_adjust_random_probevalues
+#   pgx_get_genome_regions
+# );
 
 ########    ####    ####    ####    ####    ####    ####    ####    ####    ####
 ########    ####    ####    ####    ####    ####    ####    ####    ####    ####

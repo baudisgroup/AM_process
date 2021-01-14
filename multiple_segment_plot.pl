@@ -1,0 +1,183 @@
+#!/usr/bin/perl -w
+
+$| = 1;
+
+# CPAN packages
+use Data::Dumper;
+use File::Basename;
+use POSIX 'strftime';
+use strict;
+use Term::ProgressBar;
+use YAML::XS qw(LoadFile);
+
+# use warnings;
+no warnings 'recursion';
+no warnings 'uninitialized';
+
+=pod
+
+Input files can be either tab-separated plain text files (".tsv" or such), or
+OpenOffice (".ods") spreadsheet files. In principle, Excel, too; but nobody 
+should trust Excel.
+
+Segment file name cannot contain ".", group_key has to be longer than 3 characters.
+
+-f
+  * a standard, single or multi-sample, tab-delimited Progenetix segments  file
+
+  sample  chro  start stop  mean  probes
+  GSM481286 1 742429  7883881 -0.1594 699
+  GSM481286 1 115673158 115705254 -0.3829 8
+  GSM481286 1 115722621 119771659 0.167 424
+  GSM481286 1 119776776 162617092 0.4168  1587
+  GSM481286 1 162621657 165278686 0.6508  350
+  GSM481287 3 65280711 117221337 0.4056  20041
+  ...
+
+-sf
+  * an optional tab-delimited file for labeling different sample groups
+  
+  sample  group_key group_label
+  GSM481286 icdom:85003 breast cancer, NOS
+  GSM481287 icdom:85003 breast cancer, NOS
+  GSM533241 icdom:81403 gastric adenocarcinoma
+  GSM533242 icdom:81403 gastric adenocarcinoma
+  GSM533243 icdom:81403 gastric adenocarcinoma
+  GSM126632 icdom:85003 breast cancer, NOS
+  GSM126633 icdom:85003 breast cancer, NOS
+  GSM126634 icdom:85003 breast cancer, NOS
+  ...  
+ 
+Examples:
+  - perl pgx_plot_from_files.pl -f segments.tab -sf sortfile.ods
+
+=cut
+
+# local packages
+
+my $here_path;
+BEGIN {
+  $here_path = File::Basename::dirname( eval { ( caller() )[1] } );
+  push @INC, $here_path.'/../..';
+}
+
+# local packages
+# use BeaconPlus::ConfigLoader;
+# use BeaconPlus::QueryParameters;
+# use BeaconPlus::QueryExecution;
+# use BeaconPlus::DataExporter;
+
+# local packages
+use lib './PGX';
+use PGX;
+
+# foreach my $thing ( keys %main:: ) {
+#    if ( defined &$thing ) { 
+#         print "sub $thing\n";
+#    }
+# }
+
+################################################################################
+# data import & pre-parsing ####################################################
+################################################################################
+
+my $config     =   LoadFile($here_path.'/rsrc/config.yaml') or die print 'Content-type: text'."\n\n¡No config.yaml file in this path!";
+bless $config;
+
+$config->{ERROR}  =   [];
+$config->{grouping} =   'custom';
+
+# predefined plot arguments
+# those override the ones from insite PGX::rsrc::config
+# but can be overridden again from command line input
+
+my $plotargs    =   {
+  -size_plotimage_w_px    =>   1024,
+  -size_plotmargin_px     =>   25,
+  -size_title_left_px     =>   200,
+  -size_clustertree_w_px  =>   50,
+  -size_plotarea_h_px     =>   40,
+  -size_text_px           =>   12,
+  -size_text_title_px     =>   48,
+  -size_text_subtitle_px  =>   32,
+  -size_text_title_left_px  =>  12,
+  -label_y_m    =>   '-50,0,50',
+  -chr2plot     =>   join(',', 1..22),
+  -plotregions  =>  q{},
+  -genome       =>  'grch38',
+  -plottype     =>  'histogram',
+  -min_group_no =>  3,
+  -path_loc     => $here_path.'/out',
+};
+
+# command line input
+my %args        =   @ARGV;
+$args{-sf}      ||= q{};
+
+if (-d $args{-outdir}) {
+  $plotargs->{-path_loc}  =   $args{-outdir} }
+
+foreach (keys %$plotargs) {
+  if ($args{$_} =~ /\w/) {
+    $plotargs->{$_} = $args{$_} }
+}
+
+mkdir $plotargs->{'-path_loc'};
+
+if (! -f $args{'-f'}) {
+  print <<END;
+No input file was specified:
+  -f _path_to_my_file_/segments.tab
+
+END
+}
+
+# files and paths ##############################################################
+
+my $outFileBase =   $args{'-f'};
+$outFileBase    =~  s/^.*?\/([^\/]+?)\.\w{2,4}$/$1/;
+my $sortFileBase  =   $args{'-sf'};
+$sortFileBase   =~  s/^.*?\/([^\/]+?)\.\w{2,4}$/,$1/;
+$outFileBase    =   join('/', $args{'-outdir'}, $outFileBase.$sortFileBase);
+my $matrixplotF =   $outFileBase.',samples_clustered.svg';
+my $histoplotF  =   $outFileBase.',samples_histoplot.svg';
+
+# grouping of samples  #########################################################
+
+my $pgx         =   new PGX($plotargs);
+# this uses the file reading routine; but multi-segment files have to be
+# deconvoluted first ...
+$pgx->pgx_add_segments_from_file($args{'-f'});
+$pgx->pgx_create_samples_from_segments();
+$pgx->pgx_callset_labels_from_file($args{'-sf'});
+$pgx->pgx_create_sample_collections();
+
+################################################################################
+
+# new plot object, since 
+# * $pgx->{samples}
+# * $pgx->{samplecollections}
+# are needed for the plots and would be deleted if recycling $pgx
+my $plot;
+
+# sample matrix plot ##########################################################
+
+$plotargs->{'-plottype'}    =   'multistrip';
+$plot           =   new PGX($plotargs);
+$plot->{parameters}->{plotid}   =   'multistripplot';
+$plot->{samples}    =   $pgx->{samples};
+$plot->cluster_samples();
+$plot->return_stripplot_svg();
+$plot->write_svg($matrixplotF);
+
+# (clustered) CNA histograms
+
+$plotargs->{'-plottype'}    =   'multihistogram';
+$plot           =   new PGX($plotargs);
+$plot->pgx_add_frequencymaps($pgx->{samplecollections});
+$plot->cluster_frequencymaps();
+$plot->return_histoplot_svg();
+$plot->write_svg($histoplotF);
+$plot->{svg}    =   q{};
+
+1;

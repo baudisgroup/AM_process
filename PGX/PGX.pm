@@ -1,17 +1,26 @@
+
+# use strict;
 package PGX;
 
 use File::Basename;
 use YAML::XS qw(LoadFile DumpFile);
 
-use PGX::CytobandReader;
-use PGX::GenomeIntervals;
-use PGX::Genomeplot;
-use PGX::ArrayPlotter;
-use PGX::PGXfileReader;
+use CytobandReader;
+use GenomeIntervals;
+use Genomeplot;
+use ArrayPlotter;
+use PGXfileReader;
+use PGXfileWriter;
+use PGXdataAggregation;
+use IntervalStatistics;
+use StripPlotter;
+use CytobandsPlotter;
+use HistoPlotter;
 
-require Exporter;
-@ISA    =   qw(Exporter);
-@EXPORT =   qw(new read_plot_defaults);
+#require Exporter;
+# @ISA    =   qw(Exporter);
+# @EXPORT =   qw(new read_plot_defaults);
+use Exporter::Auto;
 
 ########    ####    ####    ####    ####    ####    ####    ####    ####    ####
 ########    ####    ####    ####    ####    ####    ####    ####    ####    ####
