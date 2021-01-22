@@ -20,11 +20,7 @@ sub return_stripplot_svg {
   my $pgx = shift;
 
   $pgx->{svg} = q{};
-  
-#   while ( ($k,$v) = each %{$pgx->{parameters} } ) {
-#     print "$k => $v\n";
-#   }
-#   print "here!";
+
   $pgx->{Y} = $pgx->{parameters}->{size_plotmargin_top_px};
   my $plotW = $pgx->{parameters}->{size_plotimage_w_px};
   

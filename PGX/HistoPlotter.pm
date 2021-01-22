@@ -15,10 +15,7 @@ sub return_histoplot_svg {
   my $pgx = shift;
 
   $pgx->{svg} = q{};
-  # while ( ($k,$v) = each %{$pgx->{parameters} } ) {
-#     print "$k => $v\n";
-#   }
-#   print "here!";
+
   $pgx->{Y} = $pgx->{parameters}->{size_plotmargin_top_px};
   my $plotW = $pgx->{parameters}->{size_plotimage_w_px};
   $pgx->{areastartx} = $pgx->{parameters}->{size_plotmargin_px} + $pgx->{parameters}->{size_title_left_px};

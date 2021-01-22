@@ -1,9 +1,8 @@
 package IntervalStatistics;
 
-# use PGX::GenomeIntervals::ClusterTree;
+use ClusterTree;
 
 use Data::Dumper;
-use ClusterTree;
 
 require Exporter;
 @ISA = qw(Exporter);

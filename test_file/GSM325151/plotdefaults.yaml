@@ -1,0 +1,3 @@
+---
+cna_gain_threshold: '0.12'
+cna_loss_threshold: '-0.12'

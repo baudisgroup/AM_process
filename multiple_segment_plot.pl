@@ -62,67 +62,55 @@ BEGIN {
 }
 
 # local packages
-# use BeaconPlus::ConfigLoader;
-# use BeaconPlus::QueryParameters;
-# use BeaconPlus::QueryExecution;
-# use BeaconPlus::DataExporter;
-
-# local packages
 use lib './PGX';
 use PGX;
-
-# foreach my $thing ( keys %main:: ) {
-#    if ( defined &$thing ) { 
-#         print "sub $thing\n";
-#    }
-# }
 
 ################################################################################
 # data import & pre-parsing ####################################################
 ################################################################################
 
-my $config     =   LoadFile($here_path.'/rsrc/config.yaml') or die print 'Content-type: text'."\n\n¡No config.yaml file in this path!";
+my $config = LoadFile($here_path.'/rsrc/config.yaml') or die print 'Content-type: text'."\n\n¡No config.yaml file in this path!";
 bless $config;
 
-$config->{ERROR}  =   [];
-$config->{grouping} =   'custom';
+$config->{ERROR} = [];
+$config->{grouping} = 'custom';
 
 # predefined plot arguments
 # those override the ones from insite PGX::rsrc::config
 # but can be overridden again from command line input
 
-my $plotargs    =   {
-  -size_plotimage_w_px    =>   1024,
-  -size_plotmargin_px     =>   25,
-  -size_title_left_px     =>   200,
-  -size_clustertree_w_px  =>   50,
-  -size_plotarea_h_px     =>   40,
-  -size_text_px           =>   12,
-  -size_text_title_px     =>   48,
-  -size_text_subtitle_px  =>   32,
-  -size_text_title_left_px  =>  12,
-  -label_y_m    =>   '-50,0,50',
-  -chr2plot     =>   join(',', 1..22),
-  -plotregions  =>  q{},
-  -genome       =>  'grch38',
-  -plottype     =>  'histogram',
-  -min_group_no =>  3,
-  -path_loc     => $here_path.'/out',
+my $plotargs = {
+  -size_plotimage_w_px => 1024,
+  -size_plotmargin_px => 25,
+  -size_title_left_px => 200,
+  -size_clustertree_w_px => 50,
+  -size_plotarea_h_px => 40,
+  -size_text_px => 12,
+  -size_text_title_px => 48,
+  -size_text_subtitle_px => 32,
+  -size_text_title_left_px => 12,
+  -label_y_m => '-50,0,50',
+  -chr2plot => join(',', 1..22),
+  -plotregions => q{},
+  -genome => 'grch38',
+  -plottype => 'histogram',
+  -min_group_no => 3,
+  -path_loc => $here_path.'/out',
 };
 
 # command line input
-my %args        =   @ARGV;
-$args{-sf}      ||= q{};
+my %args = @ARGV;
+$args{-sf} ||= q{};
 
 if (-d $args{-outdir}) {
-  $plotargs->{-path_loc}  =   $args{-outdir} }
+  $plotargs->{-path_loc} = $args{-outdir} }
 
 foreach (keys %$plotargs) {
   if ($args{$_} =~ /\w/) {
     $plotargs->{$_} = $args{$_} }
 }
 
-mkdir $plotargs->{'-path_loc'};
+mkdir $args{'-outdir'};
 
 if (! -f $args{'-f'}) {
   print <<END;
@@ -130,24 +118,30 @@ No input file was specified:
   -f _path_to_my_file_/segments.tab
 
 END
+	exit;
 }
 
 # files and paths ##############################################################
 
-my $outFileBase =   $args{'-f'};
-$outFileBase    =~  s/^.*?\/([^\/]+?)\.\w{2,4}$/$1/;
-my $sortFileBase  =   $args{'-sf'};
-$sortFileBase   =~  s/^.*?\/([^\/]+?)\.\w{2,4}$/,$1/;
-$outFileBase    =   join('/', $args{'-outdir'}, $outFileBase.$sortFileBase);
-my $matrixplotF =   $outFileBase.',samples_clustered.svg';
-my $histoplotF  =   $outFileBase.',samples_histoplot.svg';
+my $outFileBase = $args{'-f'};
+$outFileBase =~ s/^.*?\/([^\/]+?)\.\w{2,4}$/$1/;
+my $sortFileBase = $args{'-sf'};
+$sortFileBase =~ s/^.*?\/([^\/]+?)\.\w{2,4}$/,$1/;
+$outFileBase = $outFileBase.$sortFileBase;
+my $matrixplotF = $outFileBase.',samples_clustered.svg';
+my $histoplotF = $outFileBase.',samples_histoplot.svg';
+
 
 # grouping of samples  #########################################################
 
-my $pgx         =   new PGX($plotargs);
+my $pgx = new PGX($plotargs);
+$pgx->{parameters}->{path_loc} = $args{'-outdir'};
+
 # this uses the file reading routine; but multi-segment files have to be
 # deconvoluted first ...
 $pgx->pgx_add_segments_from_file($args{'-f'});
+# print Dumper($pgx->{segmentdata});
+# exit;
 $pgx->pgx_create_samples_from_segments();
 $pgx->pgx_callset_labels_from_file($args{'-sf'});
 $pgx->pgx_create_sample_collections();
@@ -162,22 +156,22 @@ my $plot;
 
 # sample matrix plot ##########################################################
 
-$plotargs->{'-plottype'}    =   'multistrip';
-$plot           =   new PGX($plotargs);
-$plot->{parameters}->{plotid}   =   'multistripplot';
-$plot->{samples}    =   $pgx->{samples};
+$plotargs->{'-plottype'} = 'multistrip';
+$plot = new PGX($plotargs);
+$plot->{parameters}->{plotid} = 'multistripplot';
+$plot->{samples} = $pgx->{samples};
 $plot->cluster_samples();
 $plot->return_stripplot_svg();
 $plot->write_svg($matrixplotF);
 
 # (clustered) CNA histograms
 
-$plotargs->{'-plottype'}    =   'multihistogram';
-$plot           =   new PGX($plotargs);
+$plotargs->{'-plottype'} = 'multihistogram';
+$plot = new PGX($plotargs);
 $plot->pgx_add_frequencymaps($pgx->{samplecollections});
 $plot->cluster_frequencymaps();
 $plot->return_histoplot_svg();
 $plot->write_svg($histoplotF);
-$plot->{svg}    =   q{};
+$plot->{svg} = q{};
 
 1;

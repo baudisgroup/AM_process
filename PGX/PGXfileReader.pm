@@ -260,8 +260,8 @@ Returns:
         callset_id      =>  $segVals{callset_id},
         reference_name  =>  $segVals{reference_name},
         variant_type		=>	$varStatus,
-        start           =>  [ 1 * $segVals{start} ],
-        end             =>  [ 1 * $segVals{end} ],
+        start           =>  1 * $segVals{start},
+        end             =>  1 * $segVals{end},
         info            =>  {
           value         =>  $numfactor * $segVals{value},
           svlen         =>  1 * ($segVals{end} - $segVals{start}),

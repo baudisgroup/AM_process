@@ -221,8 +221,8 @@ sub get_arrayplot_area {
               @$areaSegments
         ];
         foreach my $seg (@$areaSegments) {
-            my $start = $seg->{start}->[0];
-            my $end   = $seg->{end}->[-1];
+            my $start = $seg->{start};
+            my $end   = $seg->{end};
             if ( $start < $pgx->{referencebounds}->{$refName}->[0] ) {
                 $start = $pgx->{referencebounds}->{$refName}->[0];
             }

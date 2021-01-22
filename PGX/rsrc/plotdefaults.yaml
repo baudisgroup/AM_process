@@ -8,11 +8,13 @@ genome: 'GRCh38'
 plotid: 'genomeplot'
 plotregions: []
 markers: []
+labels: []
 binning: 1000000
+bin_match_min: 0.0001
 title: ''
 subtitle: ''
 title_left: ''
-text_bottom_right: '&copy; 2019 progenetix.org'
+text_bottom_right: '&copy; 2020 progenetix.org'
 text_bottom_left: ""
 min_group_no: 2
 
@@ -26,6 +28,54 @@ segment_probecount_min: 2
 format_inputfiles: 'progenetix'
 simulated_probes: 'n'
 reverse: 'n'
+factor_probedots: 1
+
+# sizes
+size_plotmargin_px: 30
+size_plotmargin_top_px: 25
+size_plotmargin_bottom_px: 25
+size_title_left_px: 0
+size_text_px: 9
+size_text_title_px: 16
+size_text_subtitle_px: 14
+size_text_lab_px: 8
+size_plotarea_h_px: 100
+size_strip_h_px: 7
+size_plotarea_padding: 3
+size_plotimage_w_px: 800
+size_plotimage_h_px: 480
+size_fracbarea_h_px: 100
+size_label_y_w_px: 25
+size_label_right_px: 0
+size_chromosome_w_px: 12
+size_chromosome_padding_px: 3
+size_samplestrip_w_px: 10
+size_frequencystrip_w_px: 14
+size_matrixline_w_px: 14
+size_segments_stroke_px: 4
+size_centerline_stroke_px: 1
+size_clustertree_w_px: 50
+
+# colors
+color_plotarea_hex: '#f3f9ff'
+color_plotbackground_hex: '#ffffff'
+color_plotgrid_hex: '#c0e3ee'
+color_text_hex: '#000000'
+color_label_y_hex: '#666666'
+color_label_bottom_hex: '#999999'
+color_var_break_hex: '#EE00DD'
+color_var_break_rgb: '238,0,221'
+color_var_dup_hex: '#FFC633'
+color_var_dup_rgb: '255,198,51'
+color_var_del_hex: '#33A0FF'
+color_var_del_rgb: '51,160,255'
+color_var_amp_hex: '#FF6600'
+color_var_amp_rgb: '255,102,0'
+color_var_homoloss_hex: '#0033CC'
+color_var_homoloss_rgb: '0,51,204'
+color_connection_opacity: 0.2
+
+colorschema: orangeblue
 
 local_overrides:
   - 'cna_gain_threshold'
@@ -106,55 +156,8 @@ plottype: histogram
 titlepos: top
 title_left_rotation: none
 do_chromosomes_proportional: y
+svg_embed: 0
 
-# sizes
-size_plotmargin_px: 30
-size_plotmargin_top_px: 25
-size_plotmargin_bottom_px: 25
-size_title_left_px: 0
-size_text_px: 9
-size_text_title_px: 16
-size_text_subtitle_px: 14
-size_text_title_left_px: 10
-size_text_lab_px: 8
-size_plotarea_h_px: 100
-size_strip_h_px: 7
-size_plotarea_padding: 3
-size_plotimage_w_px: 800
-size_plotimage_h_px: 480
-size_fracbarea_h_px: 100
-size_label_y_w_px: 25
-size_label_right_px: 0
-size_chromosome_w_px: 12
-size_chromosome_padding_px: 3
-size_samplestrip_w_px: 10
-size_frequencystrip_w_px: 14
-size_matrixline_w_px: 14
-size_segments_stroke_px: 4
-size_centerline_stroke_px: 1
-size_clustertree_w_px: 50
-factor_probedots: 1
-
-# colors
-color_plotarea_hex: '#f3f9ff'
-color_plotbackground_hex: '#ffffff'
-color_plotgrid_hex: '#c0e3ee'
-color_text_hex: '#000000'
-color_label_y_hex: '#666666'
-color_label_bottom_hex: '#999999'
-color_var_break_hex: '#EE00DD'
-color_var_break_rgb: '238,0,221'
-color_var_dup_hex: '#FFC633'
-color_var_dup_rgb: '255,198,51'
-color_var_del_hex: '#33A0FF'
-color_var_del_rgb: '51,160,255'
-color_var_amp_hex: '#FF6600'
-color_var_amp_rgb: '255,102,0'
-color_var_homoloss_hex: '#0033CC'
-color_var_homoloss_rgb: '0,51,204'
-color_connection_opacity: 0.2
-
-colorschema: orangeblue
 colorschemas:
  orangeblue:
   color_var_dup_hex: '#FFC633'

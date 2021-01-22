@@ -1,0 +1,209 @@
+<svg
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+version="1.1"
+id="genomeplot"
+width="884px"
+height="233px"
+style="margin: auto; font-family: Helvetica, sans-serif;">
+
+<rect x="0" y="0" width="884" height="233" style="fill: #ffffff; " />
+
+
+<text x="442.208639189071" y="41" style="text-anchor: middle; font-size: 16px">GSM325151</text>
+<defs>
+<linearGradient id="genomeplotgpos100" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(39,39,39)" />
+    <stop offset="100%" stop-color="rgb(0,0,0)" />
+</linearGradient>
+<linearGradient id="genomeplotgpos75" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(87,87,87)" />
+    <stop offset="100%" stop-color="rgb(39,39,39)" />
+</linearGradient>
+<linearGradient id="genomeplotgpos50" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(196,196,196)" />
+    <stop offset="100%" stop-color="rgb(111,111,111)" />
+</linearGradient>
+<linearGradient id="genomeplotgpos25" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(223,223,223)" />
+    <stop offset="100%" stop-color="rgb(196,196,196)" />
+</linearGradient>
+<linearGradient id="genomeplotgneg" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="white" />
+    <stop offset="100%" stop-color="rgb(223,223,223)" />
+</linearGradient>
+<linearGradient id="genomeplotgvar" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(196,196,196)" />
+    <stop offset="100%" stop-color="rgb(111,111,111)" />
+</linearGradient>
+<linearGradient id="genomeplotstalk" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(39,39,39)" />
+    <stop offset="100%" stop-color="rgb(0,0,0)" />
+</linearGradient>
+<linearGradient id="genomeplotacen" x1="0%" x2="0%" y1="0%" y2="80%" spreadMethod="reflect">
+    <stop offset="0%" stop-color="rgb(163,55,247)" />
+    <stop offset="100%" stop-color="rgb(138,43,226)" />
+</linearGradient>
+
+<style type="text/css">
+<![CDATA[
+.chrlab { text-anchor: middle; font-size: 9px; fill: #000000 }
+]]>
+</style>
+</defs>
+<text x="442.2" y="69" class="chrlab">12</text>
+<rect x="30.0" y="73.2" width="19.8" height="9.6" style="fill: url(#genomeplotgneg); " />
+<rect x="49.8" y="72" width="13.0" height="12" style="fill: url(#genomeplotgpos25); " />
+<rect x="62.8" y="72" width="29.1" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="91.9" y="72" width="16.1" height="12" style="fill: url(#genomeplotgpos75); " />
+<rect x="107.9" y="72" width="12.4" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="120.3" y="72" width="32.2" height="12" style="fill: url(#genomeplotgpos100); " />
+<rect x="152.5" y="72" width="8.0" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="160.5" y="72" width="32.2" height="12" style="fill: url(#genomeplotgpos100); " />
+<rect x="192.7" y="72" width="8.0" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="200.7" y="72" width="17.9" height="12" style="fill: url(#genomeplotgpos50); " />
+<rect x="218.7" y="72" width="16.7" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="235.4" y="73.2" width="14.2" height="9.6" style="fill: url(#genomeplotacen); " />
+<rect x="249.6" y="73.2" width="14.2" height="9.6" style="fill: url(#genomeplotacen); " />
+<rect x="263.8" y="72" width="50.7" height="12" style="fill: url(#genomeplotgpos100); " />
+<rect x="314.5" y="72" width="16.7" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="331.2" y="72" width="14.8" height="12" style="fill: url(#genomeplotgpos25); " />
+<rect x="346.1" y="72" width="21.0" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="367.1" y="72" width="10.5" height="12" style="fill: url(#genomeplotgpos25); " />
+<rect x="377.6" y="72" width="9.3" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="386.9" y="72" width="30.9" height="12" style="fill: url(#genomeplotgpos75); " />
+<rect x="417.9" y="72" width="12.4" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="430.2" y="72" width="16.1" height="12" style="fill: url(#genomeplotgpos50); " />
+<rect x="446.3" y="72" width="23.5" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="469.8" y="72" width="26.0" height="12" style="fill: url(#genomeplotgpos75); " />
+<rect x="495.8" y="72" width="28.5" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="524.2" y="72" width="39.6" height="12" style="fill: url(#genomeplotgpos100); " />
+<rect x="563.8" y="72" width="14.2" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="578.1" y="72" width="22.3" height="12" style="fill: url(#genomeplotgpos100); " />
+<rect x="600.3" y="72" width="22.3" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="622.6" y="72" width="33.4" height="12" style="fill: url(#genomeplotgpos75); " />
+<rect x="656.0" y="72" width="14.2" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="670.2" y="72" width="31.5" height="12" style="fill: url(#genomeplotgpos50); " />
+<rect x="701.8" y="72" width="16.7" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="718.5" y="72" width="3.7" height="12" style="fill: url(#genomeplotgpos25); " />
+<rect x="722.2" y="72" width="12.4" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="734.6" y="72" width="15.5" height="12" style="fill: url(#genomeplotgpos50); " />
+<rect x="750.0" y="72" width="8.0" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="758.1" y="72" width="16.1" height="12" style="fill: url(#genomeplotgpos50); " />
+<rect x="774.2" y="72" width="31.5" height="12" style="fill: url(#genomeplotgneg); " />
+<rect x="805.7" y="72" width="20.4" height="12" style="fill: url(#genomeplotgpos50); " />
+<rect x="826.1" y="73.2" width="28.3" height="9.6" style="fill: url(#genomeplotgneg); " />
+<style type="text/css"><![CDATA[
+  .DUP {stroke-width: 4px; stroke: #FFC633; opacity: 0.8  }
+  .DEL {stroke-width: 4px; stroke: #33A0FF; opacity: 0.8  }
+  .cen {stroke-width: 1px; stroke: #c0e3ee; opacity: 0.8 ; }
+]]></style>
+<style type="text/css"><![CDATA[
+  .cen {stroke-width: 1px; stroke: #c0e3ee; opacity: 0.8 ; }
+  .tick {stroke-width: 1px; stroke: #666666; opacity: 0.8 ; }
+  .ylabs {text-anchor: end; font-size: 8px; fill: #666666;}
+  .ylabe {text-anchor: start; font-size: 8px; fill: #666666;}
+]]></style>
+<line x1="29"  y1="183.9"  x2="30"  y2="183.9"  class="tick"  />
+<line x1="854.417278378141"  y1="183.9"  x2="855.417278378141"  y2="183.9"  class="tick"  />
+<line x1="30"  y1="183.9"  x2="854.417278378141"  y2="183.9"  class="cen"  />
+<text x="28" y="186.9" class="ylabs">-3</text>
+<line x1="29"  y1="176.1"  x2="30"  y2="176.1"  class="tick"  />
+<line x1="854.417278378141"  y1="176.1"  x2="855.417278378141"  y2="176.1"  class="tick"  />
+<line x1="30"  y1="176.1"  x2="854.417278378141"  y2="176.1"  class="cen"  />
+<line x1="29"  y1="168.2"  x2="30"  y2="168.2"  class="tick"  />
+<line x1="854.417278378141"  y1="168.2"  x2="855.417278378141"  y2="168.2"  class="tick"  />
+<line x1="30"  y1="168.2"  x2="854.417278378141"  y2="168.2"  class="cen"  />
+<text x="28" y="171.2" class="ylabs">-2</text>
+<line x1="29"  y1="160.4"  x2="30"  y2="160.4"  class="tick"  />
+<line x1="854.417278378141"  y1="160.4"  x2="855.417278378141"  y2="160.4"  class="tick"  />
+<line x1="30"  y1="160.4"  x2="854.417278378141"  y2="160.4"  class="cen"  />
+<line x1="29"  y1="152.6"  x2="30"  y2="152.6"  class="tick"  />
+<line x1="854.417278378141"  y1="152.6"  x2="855.417278378141"  y2="152.6"  class="tick"  />
+<line x1="30"  y1="152.6"  x2="854.417278378141"  y2="152.6"  class="cen"  />
+<text x="28" y="155.6" class="ylabs">-1</text>
+<line x1="29"  y1="144.8"  x2="30"  y2="144.8"  class="tick"  />
+<line x1="854.417278378141"  y1="144.8"  x2="855.417278378141"  y2="144.8"  class="tick"  />
+<line x1="30"  y1="144.8"  x2="854.417278378141"  y2="144.8"  class="cen"  />
+<line x1="29"  y1="137.0"  x2="30"  y2="137.0"  class="tick"  />
+<line x1="854.417278378141"  y1="137.0"  x2="855.417278378141"  y2="137.0"  class="tick"  />
+<line x1="30"  y1="137.0"  x2="854.417278378141"  y2="137.0"  class="cen"  />
+<text x="28" y="140" class="ylabs">0</text>
+<line x1="29"  y1="129.2"  x2="30"  y2="129.2"  class="tick"  />
+<line x1="854.417278378141"  y1="129.2"  x2="855.417278378141"  y2="129.2"  class="tick"  />
+<line x1="30"  y1="129.2"  x2="854.417278378141"  y2="129.2"  class="cen"  />
+<line x1="29"  y1="121.4"  x2="30"  y2="121.4"  class="tick"  />
+<line x1="854.417278378141"  y1="121.4"  x2="855.417278378141"  y2="121.4"  class="tick"  />
+<line x1="30"  y1="121.4"  x2="854.417278378141"  y2="121.4"  class="cen"  />
+<text x="28" y="124.4" class="ylabs">1</text>
+<line x1="29"  y1="113.6"  x2="30"  y2="113.6"  class="tick"  />
+<line x1="854.417278378141"  y1="113.6"  x2="855.417278378141"  y2="113.6"  class="tick"  />
+<line x1="30"  y1="113.6"  x2="854.417278378141"  y2="113.6"  class="cen"  />
+<line x1="29"  y1="105.8"  x2="30"  y2="105.8"  class="tick"  />
+<line x1="854.417278378141"  y1="105.8"  x2="855.417278378141"  y2="105.8"  class="tick"  />
+<line x1="30"  y1="105.8"  x2="854.417278378141"  y2="105.8"  class="cen"  />
+<text x="28" y="108.8" class="ylabs">2</text>
+<line x1="29"  y1="97.9"  x2="30"  y2="97.9"  class="tick"  />
+<line x1="854.417278378141"  y1="97.9"  x2="855.417278378141"  y2="97.9"  class="tick"  />
+<line x1="30"  y1="97.9"  x2="854.417278378141"  y2="97.9"  class="cen"  />
+<line x1="29"  y1="90.1"  x2="30"  y2="90.1"  class="tick"  />
+<line x1="854.417278378141"  y1="90.1"  x2="855.417278378141"  y2="90.1"  class="tick"  />
+<line x1="30"  y1="90.1"  x2="854.417278378141"  y2="90.1"  class="cen"  />
+<text x="28" y="93.1" class="ylabs">3</text>
+<rect x="30" y="87" width="824.4" height="100" style="fill: #f3f9ff; fill-opacity: 0.8; " />
+<image
+  x="30"
+  y="87"
+  width="824.4"
+  height="100"
+  xlink:href="data:image/png;base64,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
+"
+/>
+<line x1="30"  y1="137"  x2="854.417278378141"  y2="137"  class="cen"  />
+<text x="30" y="205" style="text-anchor: start; font-size: 9px; fill: #999999"></text>
+<text x="854.417278378141" y="205" style="text-anchor: end; font-size: 9px; fill: #999999">&#x24B8; 2021 progenetix.org</text>
+</svg>
