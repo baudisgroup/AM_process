@@ -309,8 +309,11 @@ if (whichStep %in% c('reseg', 'all')){
             log <- c(log,tryCatch({
                     logfile <- file.path(post_process_dir,seriesName,cid,sprintf('%sseg,log.txt',filetype))
                     adj_probe <- ifelse(file.exists(logfile), length(grep("adjusted probe", readLines(logfile))) == 0, T)
-                    print(paste("Adjust probe:", adj_probe))
-                    do.call(adjustMedian,c(localsettings, adj_probe = adj_probe))
+
+                    if (file.exists(file.path(post_process_dir, seriesName, cid,'probes,cn.tsv'))){
+                        print(paste("Adjust probe:", adj_probe))
+                        do.call(adjustMedian,c(localsettings, adj_probe = adj_probe))
+                    }
 
                     lmd <- do.call(getLmd,localsettings)
                     gp <- do.call(getGP,localsettings)
