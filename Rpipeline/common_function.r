@@ -38,10 +38,11 @@ adjustMedian <- function(remotedir,seriesName,arrayName,workingdir,filename,chip
         file.path(remotedir,seriesName,arrayName,name), overwrite = F)
     }
     valuecol <- chooseFile(filename,1) [[2]]
+    probecol <- chooseFile(filename,1) [[3]]
     segfile <- read.table(file.path(remotedir,seriesName,arrayName,newname),header = T,stringsAsFactors = F)
     colnames(segfile) <- c('sample_id','chromosome','start','end','value','probes')
 
-    med <- round(weightedMedian(segfile[,valuecol],segfile[,valuecol+1]),5)
+    med <- round(weightedMedian(segfile[,valuecol],segfile[,probecol]),5)
     segfile[,valuecol] <- round(segfile[,valuecol]-med,4)
     newname <-chooseFile(filename,0) [[1]]
     write.table(segfile,file=file.path(remotedir,seriesName,arrayName,newname), sep="\t", quote=FALSE,row.names=FALSE)
