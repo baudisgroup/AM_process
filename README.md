@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ArrayMap (AM) Processing SNP arrays of 9 different platforms
 
 ## Summary of highlights
@@ -36,4 +35,3 @@ perl multiple_segment_plot.pl -f  test_file/multiple_segment_test.tsv -sf test_f
 `$workingdir/processed/$series/$array`. But `probe` step requires several other subdirectories in the `workingdir`: `rawData`, `annotationData`, `PlatformInfo`, `referenceFile`.
 3. Default raw data retrieval directory is `$workingdir/rawData`
     in the structure `series/array/xxx.CEL`.
->>>>>>> origin/master
