@@ -8,17 +8,19 @@
  * for multiple samples, plot aggregated CN segments by frequency (strip plot) and heatmap of CN landscape sorted by hierarchical clustering.
 
 ## Examples utlity scripts:
+
 ```
 perl arrayplotter.pl -in test_file/GSM325151
 perl arrayplotter.pl -in test_file/GSM412388
 perl multiple_segment_plot.pl -f  test_file/multiple_segment_test.tsv -sf test_file/sample_types.tsv -genome hg19
 ```
-=======
+
 ##################################
 #### Whole SNP array pipeline ####
 ##################################
 
 ### Includes
+
 * extract probe values from .CEL files 
 * segment with DNAcopy
 * cleanup segment, adjust baseline
@@ -30,6 +32,7 @@ perl multiple_segment_plot.pl -f  test_file/multiple_segment_test.tsv -sf test_f
 * update dbstats (not tested)
 
 ### Notes
+
 1. The metadata directory is `/Volumes/arraymapIncoming/GEOmeta/`
 2. Default `workingdir` is `~/aroma/hg19/`, for any step after probe, `workingdir` can be anything as long as samples in the following structure:
 `$workingdir/processed/$series/$array`. But `probe` step requires several other subdirectories in the `workingdir`: `rawData`, `annotationData`, `PlatformInfo`, `referenceFile`.
